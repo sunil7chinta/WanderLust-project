@@ -85,11 +85,6 @@ app.use((req, res, next) => {
   return next();
 });
 
-//Calling to the root route
-app.get("/", (req, res) => {
-  res.send("this is root");
-});
-
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
