@@ -8,6 +8,7 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const mongoose = require("mongoose");
+const Listing = require("./models/listing");
 const ExpressError = require("./utils/ExpressError");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -86,8 +87,9 @@ app.use((req, res, next) => {
 });
 
 //Calling to the root route
-app.get("/", (req, res) => {
-  res.render("./listings/index.ejs");
+app.get("/", async (req, res) => {
+   let Listings = await Listing.find({});
+  res.render("./listings/index.ejs", { Listings });
 });
 
 app.use("/listings", listingRouter);
