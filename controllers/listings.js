@@ -40,7 +40,7 @@ module.exports.showListings = async (req, res) => {
     .populate("owner");
   if (!listing) {
     req.flash("error", "Listing you are looking for doesn't exist!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }
   res.render("./listings/show.ejs", { listing });
 };
@@ -49,7 +49,7 @@ module.exports.renderEditForm = async (req, res) => {
   let listing = await Listing.findById(id);
   if (!listing) {
     req.flash("error", "Listing you are looking for doesn't exist!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }
   let originalImageUrl = listing.image.url;
   originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_200,h_100");

@@ -2,6 +2,7 @@ if (process.env.NODE_ENV != "production") {
   require("dotenv").config();
 }
 
+const PORT = process.env.PORT;
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -19,26 +20,25 @@ const reviewRouter = require("./routes/review");
 const userRouter = require("./routes/user");
 
 const session = require("express-session");
-const MongoStore = require("connect-mongo");
+const MongoStore = require("connect-mongo").default;
 const flash = require("connect-flash");
 
 //connecting to the database
-const atlas_url = process.env.ATLASDB_URL;
-async function main() {
-  await mongoose.connect(atlas_url);
-}
-main()
-  .then((res) => {
-    console.log("connected DB");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+async function startServer() {
+  try {
+    await mongoose.connect(process.env.ATLASDB_URL);
+    console.log("MongoDB connected");
 
-//Creating a port
-app.listen("3000", () => {
-  console.log("app is listening at the port 3000");
-});
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("MongoDB connection failed:", err);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -49,15 +49,15 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 
 const store = MongoStore.create({
-  mongoUrl: atlas_url,
+  mongoUrl: process.env.ATLASDB_URL,
   crypto: {
     secret: process.env.SECRET,
   },
   touchAfter: 24 * 3600,
 });
 store.on("error", (err) => {
-  console.log("ERROR IN MONGO SESSION STORE",err);
-})
+  console.log("ERROR IN MONGO SESSION STORE", err);
+});
 const sessionOptions = {
   store,
   secret: process.env.SECRET,
@@ -75,20 +75,20 @@ app.use(flash());
 //authentication
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use((req, res, next) => {
+  res.locals.currUser = req.user;
+  res.locals.successMsg = req.flash("success");
+  res.locals.errorMsg = req.flash("error");
+  return next();
+});
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use((req, res, next) => {
-  res.locals.successMsg = req.flash("success");
-  res.locals.errorMsg = req.flash("error");
-  res.locals.currUser = req.user;
-  return next();
-});
-
 //Calling to the root route
 app.get("/", async (req, res) => {
-   let Listings = await Listing.find({});
+  let Listings = await Listing.find({});
   res.render("./listings/index.ejs", { Listings });
 });
 
@@ -102,6 +102,10 @@ app.all("*", (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
   let { statusCode = 500, message = "something went wrong" } = err;
   res.status(statusCode).render("./listings/error.ejs", { err });
 });
