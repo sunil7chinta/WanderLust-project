@@ -107,7 +107,7 @@ WanderLust-project/
 
 ### Environment Configuration
 
-Create a `.env` file inside the `app-code/` directory:
+Create a .env file in the root directory (same level as docker-compose.yml):
 
 ```env
 PORT=3000
@@ -151,7 +151,7 @@ docker build -t wanderlust-app .
 ### 🔹 Run the Container
 
 ```bash
-docker run -p 3000:3000 --env-file app-code/.env wanderlust-app
+docker run -p 3000:3000 --env-file .env wanderlust-app
 ```
 Access Locally:
 
