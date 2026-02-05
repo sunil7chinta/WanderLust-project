@@ -156,7 +156,7 @@ docker run -p 3000:3000 --env-file app-code/.env wanderlust-app
 Access Locally:
 
 ```
-http://localhost:80
+http://localhost:3000
 ```
 ---
 
