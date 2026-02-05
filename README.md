@@ -153,7 +153,11 @@ docker build -t wanderlust-app .
 ```bash
 docker run -p 3000:3000 --env-file app-code/.env wanderlust-app
 ```
+Access Locally:
 
+```
+http://localhost:80
+```
 ---
 
 ## 🔹 Using Docker Compose (Preferred)
@@ -164,7 +168,7 @@ docker-compose up --build
 Access Locally:
 
 ```
-http://localhost:3000
+http://localhost:80
 ```
 ---
 
