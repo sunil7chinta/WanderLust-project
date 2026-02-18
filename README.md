@@ -89,7 +89,7 @@ WanderLust-project/
 
 ---
 
-> Note: All application logic resides inside the `app-code/` directory.
+> Note: All application logic resides inside the `app-code/` directory
 
 ---
 
